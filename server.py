@@ -2,13 +2,13 @@ from flask import Flask, request, jsonify,render_template
 import util
 
 
-server = Flask(__name__)
+app = Flask(__name__)
 
-@server.route('/')
+@app.route('/')
 def home():
     return render_template('index.html')
 
-@server.route('/get_location_names', methods=['GET'])
+@app.route('/get_location_names', methods=['GET'])
 def get_location_names():
     response = jsonify({
         'locations': util.get_location_names()
@@ -17,7 +17,7 @@ def get_location_names():
 
     return response
 
-@server.route('/predict_home_price', methods=['GET', 'POST'])
+@app.route('/predict_home_price', methods=['GET', 'POST'])
 def predict_home_price():
     total_sqft = float(request.form['total_sqft'])
     location = request.form['location']
@@ -34,4 +34,4 @@ def predict_home_price():
 if __name__ == "__main__":
     print("Starting Python Flask Server For Home Price Prediction...")
     util.load_saved_artifacts()
-    server.run()
+    app.run()
