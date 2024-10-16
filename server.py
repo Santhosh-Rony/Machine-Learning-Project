@@ -1,3 +1,4 @@
+#server.py
 from flask import Flask, request, jsonify,render_template
 import util
 
@@ -17,19 +18,29 @@ def get_location_names():
 
     return response
 
-@app.route('/predict_home_price', methods=['GET', 'POST'])
+@app.route('/predict_home_price', methods=['POST'])
 def predict_home_price():
-    total_sqft = float(request.form['total_sqft'])
-    location = request.form['location']
-    bhk = int(request.form['bhk'])
-    bath = int(request.form['bath'])
+    try:
+        total_sqft = float(request.form['total_sqft'])
+        location = request.form['location']
+        bhk = int(request.form['bhk'])
+        bath = int(request.form['bath'])
 
-    response = jsonify({
-        'estimated_price': util.get_estimated_price(location,total_sqft,bhk,bath)
-    })
+        # Add validation for inputs if necessary
+        if total_sqft <= 0 or bhk <= 0 or bath <= 0:
+            return jsonify({'error': 'Invalid input values'}), 400
+
+        estimated_price = util.get_estimated_price(location, total_sqft, bhk, bath)
+
+        response = jsonify({
+            'estimated_price': estimated_price
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500  # Internal server error
+
     response.headers.add('Access-Control-Allow-Origin', '*')
-
     return response
+
 
 if __name__ == "__main__":
     print("Starting Python Flask Server For Home Price Prediction...")
