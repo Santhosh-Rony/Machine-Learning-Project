@@ -9,7 +9,7 @@ CORS(app)
 def home():
     return render_template('index.html')
 
-@app.route('/api/get_location_names', methods=['GET'])
+@app.route('/http://127.0.0.1:5000/get_location_names', methods=['GET'])
 def get_location_names():
     try:
         locations = util.get_location_names()
@@ -21,7 +21,7 @@ def get_location_names():
     except Exception as e:
         return jsonify({'error': str(e)}), 500  # Internal server error
 
-@app.route('/api/predict_home_price', methods=['POST'])
+@app.route('/http://127.0.0.1:5000/predict_home_price', methods=['POST'])
 def predict_home_price():
     try:
         total_sqft = float(request.form['total_sqft'])
