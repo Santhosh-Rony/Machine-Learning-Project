@@ -9,7 +9,7 @@ CORS(app)
 def home():
     return render_template('index.html')
 
-@app.route('/http://127.0.0.1:5000/get_location_names', methods=['GET'])
+@app.route('/get_location_names', methods=['GET'])
 def get_location_names():
     try:
         locations = util.get_location_names()
@@ -21,7 +21,7 @@ def get_location_names():
     except Exception as e:
         return jsonify({'error': str(e)}), 500  # Internal server error
 
-@app.route('/http://127.0.0.1:5000/predict_home_price', methods=['POST'])
+@app.route('/predict_home_price', methods=['POST'])
 def predict_home_price():
     try:
         total_sqft = float(request.form['total_sqft'])
@@ -29,11 +29,8 @@ def predict_home_price():
         bhk = int(request.form['bhk'])
         bath = int(request.form['bath'])
 
-        # Validate input
-        if total_sqft <= 0 or bhk <= 0 or bath <= 0:
-            return jsonify({'error': 'Invalid input values'}), 400
-
-        estimated_price = util.get_estimated_price(location, total_sqft, bhk, bath)
+        # Use logistic regression model or another ML model for prediction
+        estimated_price = util.predict_home_price(location, total_sqft, bhk, bath)
 
         response = jsonify({
             'estimated_price': estimated_price
