@@ -1,24 +1,27 @@
-#server.py
-from flask import Flask, request, jsonify,render_template
+from flask import Flask, request, jsonify, render_template
+from flask_cors import CORS
 import util
 
-
 app = Flask(__name__)
+CORS(app)
 
 @app.route('/')
 def home():
     return render_template('index.html')
 
-@app.route('/get_location_names', methods=['GET'])
+@app.route('/api/get_location_names', methods=['GET'])
 def get_location_names():
-    response = jsonify({
-        'locations': util.get_location_names()
-    })
-    response.headers.add('Access-Control-Allow-Origin', '*')
+    try:
+        locations = util.get_location_names()
+        response = jsonify({
+            'locations': locations
+        })
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500  # Internal server error
 
-    return response
-
-@app.route('/predict_home_price', methods=['POST'])
+@app.route('/api/predict_home_price', methods=['POST'])
 def predict_home_price():
     try:
         total_sqft = float(request.form['total_sqft'])
@@ -26,7 +29,7 @@ def predict_home_price():
         bhk = int(request.form['bhk'])
         bath = int(request.form['bath'])
 
-        # Add validation for inputs if necessary
+        # Validate input
         if total_sqft <= 0 or bhk <= 0 or bath <= 0:
             return jsonify({'error': 'Invalid input values'}), 400
 
@@ -35,12 +38,10 @@ def predict_home_price():
         response = jsonify({
             'estimated_price': estimated_price
         })
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
     except Exception as e:
         return jsonify({'error': str(e)}), 500  # Internal server error
-
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    return response
-
 
 if __name__ == "__main__":
     print("Starting Python Flask Server For Home Price Prediction...")
